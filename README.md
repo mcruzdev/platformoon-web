@@ -1,6 +1,10 @@
 # PlatforMoon Web
 
-![Platform screenshot](docs/screenshot.png)
+## Applications
+![Applications Page](docs/screenshots/applications.png)
+
+## New application
+![New Application Page](docs/screenshots/new-application.png)
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
