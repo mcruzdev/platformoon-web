@@ -19,9 +19,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const formSchema = z.object({
   name: z.string().min(3).max(50),
   description: z.string().min(3).max(200),
+  language: z.string().min(3).max(200),
+  kind: z.string().min(3).max(200),
 });
 
 export default function Applications() {
@@ -31,6 +40,8 @@ export default function Applications() {
     defaultValues: {
       name: "",
       description: "",
+      language: "",
+      kind: ""
     },
   });
 
@@ -72,6 +83,61 @@ export default function Applications() {
                   </FormItem>
                 )}
               ></FormField>
+
+              <FormField
+                control={form.control}
+                name="kind"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kind</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select the project kind" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="BACKEND">Backend</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      The kind of project this application is.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Language</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a programming language" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="GO">GoLang</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      The programming language used to build this application.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="description"
