@@ -27,10 +27,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 const formSchema = z.object({
-  name: z.string().min(3).max(50),
+  applicationName: z.string().min(3).max(50),
   description: z.string().min(3).max(200),
-  language: z.string().min(3).max(200),
-  kind: z.string().min(3).max(200),
+  language: z.enum(["GO", "JAVA"]),
+  kind: z.enum(["BACKEND"]),
 });
 
 export default function Applications() {
@@ -41,15 +41,28 @@ export default function Applications() {
       name: "",
       description: "",
       language: "",
-      kind: ""
+      kind: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast({
-      title: "Application created",
-      description: "Your application was created successfully",
+    fetch("/api/applications", {
+      method: "POST",
+      body: JSON.stringify(values),
+    }).then((response) => {
+      if (response.status !== 201) {
+        toast({
+          title: "Application creation failed",
+          description: "Your application could not be created",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Application created",
+          description: "Your application was created successfully",
+        });
+        form.reset();
+      }
     });
   }
 
@@ -69,7 +82,7 @@ export default function Applications() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="name"
+                name="applicationName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Application name</FormLabel>
@@ -128,6 +141,7 @@ export default function Applications() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="GO">GoLang</SelectItem>
+                        <SelectItem value="JAVA">Java</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription>

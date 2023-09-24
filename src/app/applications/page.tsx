@@ -15,8 +15,16 @@ import {
 } from "@/components/ui/table";
 import { FaGolang } from "react-icons/fa6";
 import Link from "next/link";
+import { useState } from "react";
+import Language from "@/components/language";
 
 export default function Applications() {
+  const [applications, setApplications] = useState([]);
+
+  fetch("/api/applications")
+    .then((response) => response.json())
+    .then((data) => setApplications(data));
+
   return (
     <div className="flex flex-col p-4 gap-4">
       <Tabs defaultValue="applications">
@@ -37,19 +45,29 @@ export default function Applications() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Technology</TableHead>
+                <TableHead>Kind</TableHead>
+                <TableHead>Language</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-light">platformoon-apps</TableCell>
-                <TableCell className="font-light">
-                  A GoLang API responsible for managing Platformoon`s apps
-                </TableCell>
-                <TableCell>
-                  <FaGolang size={30} />
-                </TableCell>
-              </TableRow>
+              {applications.map((app: any) => {
+                return (
+                  <TableRow key={app.id}>
+                    <TableCell className="font-light">{app.name}</TableCell>
+                    <TableCell className="font-light">
+                      {app.description}
+                    </TableCell>
+                    <TableCell>
+                      <p className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+                        {app.kind}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <Language name={app.language} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TabsContent>
