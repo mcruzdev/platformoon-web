@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FaGolang } from "react-icons/fa6";
 import Link from "next/link";
 import { useState } from "react";
 import Language from "@/components/language";
@@ -21,7 +20,7 @@ import Language from "@/components/language";
 export default function Applications() {
   const [applications, setApplications] = useState([]);
 
-  fetch("/api/applications")
+  fetch("/api/v1/applications")
     .then((response) => response.json())
     .then((data) => setApplications(data));
 
@@ -53,7 +52,9 @@ export default function Applications() {
               {applications.map((app: any) => {
                 return (
                   <TableRow key={app.id}>
-                    <TableCell className="font-light">{app.name}</TableCell>
+                    <Link href={`/applications/${app.id}/view`}>
+                      <TableCell className="font-light">{app.name}</TableCell>
+                    </Link>
                     <TableCell className="font-light">
                       {app.description}
                     </TableCell>

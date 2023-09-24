@@ -7,6 +7,6 @@ export default function Language({ name }: { name: string }) {
     case "JAVA":
       return <FaJava size={30} />;
     default:
-      null;
+      return null;
   }
 }

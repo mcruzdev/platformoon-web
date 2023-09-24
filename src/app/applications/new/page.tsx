@@ -46,7 +46,7 @@ export default function Applications() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    fetch("/api/applications", {
+    fetch("/api/v1/applications", {
       method: "POST",
       body: JSON.stringify(values),
     }).then((response) => {
@@ -185,3 +185,6 @@ export default function Applications() {
     </div>
   );
 }
+
+
+// alter column update column lenght
