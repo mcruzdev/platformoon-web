@@ -4,10 +4,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import {
-  ExitIcon,
-} from "@radix-ui/react-icons";
+import { ExitIcon } from "@radix-ui/react-icons";
 import { Toaster } from "@/components/ui/toaster";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,6 +34,11 @@ export default function RootLayout({
                   alt="Platformoon logo"
                   className="rounded-full shadow-2xl"
                 />
+              </div>
+              <div>
+                <Link href="/applications">
+                  <Button variant="secondary" className="w-full bg-violet-900 hover:bg-violet-950">Apps</Button>
+                </Link>
               </div>
               <div className="flex gap-4 h-full">
                 <Button className="w-full self-end" variant="destructive">
