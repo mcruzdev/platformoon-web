@@ -1,7 +1,6 @@
 "use client";
 
 import Language from "@/components/language";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,12 +27,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
+
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon } from "@radix-ui/react-icons";
-import { SelectContent, SelectItem } from "@radix-ui/react-select";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -41,13 +39,8 @@ import { FaGithub } from "react-icons/fa6";
 import { z } from "zod";
 
 const createDeploymentSchema = z.object({
-  name: z.string().min(3).max(14),
-  version: z
-    .string()
-    .regex(
-      /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/,
-      "Invalid semver version"
-    ),
+  environment: z.string().min(3).max(14),
+  version: z.string(),
 });
 
 export default function Application({ params }: { params: { id: string } }) {
@@ -56,10 +49,12 @@ export default function Application({ params }: { params: { id: string } }) {
   const form = useForm<z.infer<typeof createDeploymentSchema>>({
     resolver: zodResolver(createDeploymentSchema),
     defaultValues: {
-      name: "",
+      environment: "",
       version: "",
     },
   });
+
+  const { toast } = useToast();
 
   useEffect(() => {
     function fetchData() {
@@ -71,6 +66,27 @@ export default function Application({ params }: { params: { id: string } }) {
   }, []);
 
   function onSubmit(values: z.infer<typeof createDeploymentSchema>) {
+    fetch("/api/v1/deployments", {
+      method: "POST",
+      body: JSON.stringify({
+        environment: values.environment,
+        applicatonVersion: values.version,
+        applicationName: application.name,
+      }),
+    }).then((response) => {
+      if (response.status !== 202) {
+        toast({
+          title: "Deployment creation failed",
+          description: "Your deployment could not be created",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Deployment created",
+          description: "Your deployment has been created",
+        });
+      }
+    });
     setDialog(false);
   }
 
@@ -153,19 +169,19 @@ export default function Application({ params }: { params: { id: string } }) {
                       <div className="grid gap-4 py-4">
                         <FormField
                           control={form.control}
-                          name="name"
+                          name="environment"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Name</FormLabel>
+                              <FormLabel>Environemnt</FormLabel>
                               <FormControl>
                                 <Input
-                                  id="name"
+                                  id="environment"
                                   className="col-span-3"
                                   {...field}
                                 />
                               </FormControl>
                               <FormDescription>
-                                This is the application name
+                                This is the environment name
                               </FormDescription>
                               <FormMessage />
                             </FormItem>

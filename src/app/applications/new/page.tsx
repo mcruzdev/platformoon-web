@@ -173,7 +173,7 @@ export default function Applications() {
                 )}
               ></FormField>
               <div className="flex justify-end">
-                <Button type="submit">
+                <Button  type="submit">
                   <RocketIcon className="mr-2 h-4 w-4" />
                   Submit
                 </Button>
