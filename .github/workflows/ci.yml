@@ -27,7 +27,7 @@ jobs:
       - name: Run next lint
         run: npm run lint
   build:
-    name: build and test 
+    name: build
     runs-on: ubuntu-latest
 
     steps:
