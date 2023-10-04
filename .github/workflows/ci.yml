@@ -3,14 +3,31 @@ name: CI
 on:
   pull_request:
       branches:
-        - master
+        - main
   push:
     branches:
       - main
 
 jobs:
+  lint:
+    # Give your job a name that will show up in the GitHub Actions web UI
+    name: Next Lint
+    # We'll run this on a Linux (Ubuntu) VM, since we'll deploy on Linux too.
+    runs-on: ubuntu-latest
+    # We run these steps one after the other, and if any fail, we stop the process
+    steps:
+      # https://github.com/actions/checkout
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install node dependencies
+        # Use `ci` vs. `install`, see https://docs.npmjs.com/cli/v8/commands/npm-ci
+        run: npm ci
+
+      - name: Run next lint
+        run: npm run lint
   build:
-    name: 
+    name: build and test 
     runs-on: ubuntu-latest
 
     steps:
