@@ -30,7 +30,7 @@ const formSchema = z.object({
   applicationName: z.string().min(3).max(50),
   description: z.string().min(3).max(200),
   language: z.enum(["GO", "JAVA"]),
-  kind: z.enum(["BACKEND"]),
+  kind: z.enum(["BACKEND", "REPOSITORY"]),
 });
 
 export default function Applications() {
@@ -114,6 +114,7 @@ export default function Applications() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="BACKEND">Backend</SelectItem>
+                        <SelectItem value="REPOSITORY">Repository</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription>
@@ -185,6 +186,3 @@ export default function Applications() {
     </div>
   );
 }
-
-
-// alter column update column lenght

@@ -10,15 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   Form,
   FormControl,
   FormDescription,
@@ -31,21 +22,32 @@ import { useToast } from "@/components/ui/use-toast";
 
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon, CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaGithub } from "react-icons/fa6";
+import { FaCheck, FaChevronDown, FaGithub, FaStore } from "react-icons/fa6";
 import { z } from "zod";
+import { Popover, PopoverContent } from "@/components/ui/popover";
+import { PopoverTrigger } from "@radix-ui/react-popover";
+import { cn } from "@/lib/utils";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { CollapsibleContent } from "@radix-ui/react-collapsible";
 
 const createDeploymentSchema = z.object({
-  environment: z.string().min(3).max(14),
-  version: z.string(),
+  environment: z.string({
+    required_error: "Please type a environment name"
+  }).min(3).max(14),
+  version: z.string({
+    required_error: "Please select a version"
+  }),
 });
 
 export default function Application({ params }: { params: { id: string } }) {
   const [application, setApplication] = useState({});
-  const [dialog, setDialog] = useState<boolean>(false);
+  const [versions, setVersions] = useState(["1.1.1", "1.0.1"]);
+  const [showDeployForm, setShowDeployForm] = useState(false);
   const form = useForm<z.infer<typeof createDeploymentSchema>>({
     resolver: zodResolver(createDeploymentSchema),
     defaultValues: {
@@ -61,6 +63,12 @@ export default function Application({ params }: { params: { id: string } }) {
       fetch("/api/v1/applications/" + params.id)
         .then((response) => response.json())
         .then((data) => setApplication(data));
+    }
+
+    function fetchVersions() {
+      fetch("/api/v1/applications/" + params.id + "/versions")
+        .then((response) => response.json())
+        .then((data) => setVersions(data));
     }
     fetchData();
   }, []);
@@ -105,7 +113,7 @@ export default function Application({ params }: { params: { id: string } }) {
             <CardContent className="flex justify-center content-center">
               <Link
                 target="_blank"
-                href="https://github.com/platformoon/destroyer-server"
+                href={`https://github.com/platformoon/${application.name}`}
               >
                 <FaGithub size={30} />
               </Link>
@@ -138,35 +146,16 @@ export default function Application({ params }: { params: { id: string } }) {
         </CardHeader>
         <CardContent className="w-full">
           <div className="flex flex-col gap-4">
-            <p className="font-light">You do not have a deployment yet</p>
+            <p hidden={showDeployForm} className="font-light">You do not have a deployment yet</p>
             <div className="flex py-4 w-full">
-              <Dialog
-                open={dialog}
-                onOpenChange={(open) => {
-                  setDialog(!dialog);
-                  if (open) {
-                    form.reset();
-                  }
-                }}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="default">
-                    New <PlusIcon className="ml-2 h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>New Deployment</DialogTitle>
-                    <DialogDescription>
-                      Create a new deployment to run your application.
-                    </DialogDescription>
-                  </DialogHeader>
+              <Collapsible>
+                <CollapsibleContent>
                   <Form {...form}>
                     <form
                       id="create-deployment-form"
                       onSubmit={form.handleSubmit(onSubmit)}
                     >
-                      <div className="grid gap-4 py-4">
+                      <div className="grid gap-4">
                         <FormField
                           control={form.control}
                           name="environment"
@@ -191,16 +180,52 @@ export default function Application({ params }: { params: { id: string } }) {
                           control={form.control}
                           name="version"
                           render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="flex flex-col">
                               <FormLabel>Version</FormLabel>
-                              <FormControl>
-                                <Input
-                                  id="version"
-                                  defaultValue="test"
-                                  className="col-span-3"
-                                  {...field}
-                                />
-                              </FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button variant="outline" role="combobox"
+                                      className={cn(
+                                        "justify-between",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                    >
+                                      {
+                                        field.value ? versions.find((version) => version === field.value) : "Select the version"
+                                      }
+                                      <FaChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50"></FaChevronDown>
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <Command>
+                                    <CommandInput placeholder="Search version..." />
+                                    <CommandEmpty>No version found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {versions.map((version) => (
+                                        <CommandItem
+                                          value={version}
+                                          key={version}
+                                          onSelect={() => {
+                                            form.setValue("version", version)
+                                          }}
+                                        >
+                                          <FaCheck
+                                            className={cn(
+                                              "mr-2 h-4 w-4",
+                                              version === field.value
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                            )}
+                                          />
+                                          {version}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
                               <FormDescription>
                                 This is the application version
                               </FormDescription>
@@ -208,17 +233,26 @@ export default function Application({ params }: { params: { id: string } }) {
                             </FormItem>
                           )}
                         ></FormField>
+                        <div className="flex flex-row gap-4">
+                          <Button variant="default" size="default" type="submit">
+                            Save <CheckIcon className="ml-2 h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="default" type="reset">
+                            Cancel <Cross1Icon className="ml-2 h-4 w-4" />
+                          </Button>
+                        </div>
+
                       </div>
+
                     </form>
                   </Form>
-
-                  <DialogFooter>
-                    <Button form="create-deployment-form" type="submit">
-                      Save changes
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                </CollapsibleContent>
+                <CollapsibleTrigger hidden={showDeployForm} onClick={() => setShowDeployForm(!showDeployForm)} >
+                  <Button variant="default">
+                    New <PlusIcon className="ml-2 h-4 w-4" />
+                  </Button>
+                </CollapsibleTrigger>
+              </Collapsible>
             </div>
           </div>
         </CardContent>
