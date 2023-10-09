@@ -95,7 +95,6 @@ export default function Application({ params }: { params: { id: string } }) {
         });
       }
     });
-    setDialog(false);
   }
 
   return (
@@ -148,7 +147,7 @@ export default function Application({ params }: { params: { id: string } }) {
           <div className="flex flex-col gap-4">
             <p hidden={showDeployForm} className="font-light">You do not have a deployment yet</p>
             <div className="flex py-4 w-full">
-              <Collapsible>
+              <Collapsible open={showDeployForm}>
                 <CollapsibleContent>
                   <Form {...form}>
                     <form
@@ -237,7 +236,7 @@ export default function Application({ params }: { params: { id: string } }) {
                           <Button variant="default" size="default" type="submit">
                             Save <CheckIcon className="ml-2 h-4 w-4" />
                           </Button>
-                          <Button variant="outline" size="default" type="reset">
+                          <Button variant="outline" size="default" type="reset" onClick={() => setShowDeployForm(!showDeployForm)}>
                             Cancel <Cross1Icon className="ml-2 h-4 w-4" />
                           </Button>
                         </div>
@@ -247,7 +246,7 @@ export default function Application({ params }: { params: { id: string } }) {
                     </form>
                   </Form>
                 </CollapsibleContent>
-                <CollapsibleTrigger hidden={showDeployForm} onClick={() => setShowDeployForm(!showDeployForm)} >
+                <CollapsibleTrigger hidden={showDeployForm} onClick={() => setShowDeployForm(!showDeployForm)}>
                   <Button variant="default">
                     New <PlusIcon className="ml-2 h-4 w-4" />
                   </Button>
