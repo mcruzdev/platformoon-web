@@ -46,7 +46,7 @@ const createDeploymentSchema = z.object({
 
 export default function Application({ params }: { params: { id: string } }) {
   const [application, setApplication] = useState({});
-  const [versions, setVersions] = useState(["1.1.1", "1.0.1"]);
+  const [versions, setVersions] = useState([]);
   const [showDeployForm, setShowDeployForm] = useState(false);
   const form = useForm<z.infer<typeof createDeploymentSchema>>({
     resolver: zodResolver(createDeploymentSchema),
@@ -68,9 +68,16 @@ export default function Application({ params }: { params: { id: string } }) {
     function fetchVersions() {
       fetch("/api/v1/applications/" + params.id + "/versions")
         .then((response) => response.json())
-        .then((data) => setVersions(data));
+        .then((data) => setVersions(data.versions));
     }
-    fetchData();
+
+    Promise.all(
+      [
+        fetchData(),
+        fetchVersions()
+      ]
+    );
+
   }, []);
 
   function onSubmit(values: z.infer<typeof createDeploymentSchema>) {
