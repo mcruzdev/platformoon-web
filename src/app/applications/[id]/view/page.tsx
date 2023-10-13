@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
+import { Application } from "@/@types";
 
 const createDeploymentSchema = z.object({
   environment: z.string({
@@ -45,7 +46,12 @@ const createDeploymentSchema = z.object({
 });
 
 export default function Application({ params }: { params: { id: string } }) {
-  const [application, setApplication] = useState({});
+  const [application, setApplication] = useState<Application>({
+    description: "",
+    kind: "",
+    language: "",
+    name: ""
+  });
   const [versions, setVersions] = useState([]);
   const [showDeployForm, setShowDeployForm] = useState(false);
   const form = useForm<z.infer<typeof createDeploymentSchema>>({
@@ -78,7 +84,7 @@ export default function Application({ params }: { params: { id: string } }) {
       ]
     );
 
-  }, []);
+  }, [params.id]);
 
   function onSubmit(values: z.infer<typeof createDeploymentSchema>) {
     fetch("/api/v1/deployments", {
