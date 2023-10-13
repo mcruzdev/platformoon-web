@@ -14,15 +14,22 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Language from "@/components/language";
 
 export default function Applications() {
   const [applications, setApplications] = useState([]);
 
-  fetch("/api/v1/applications")
-    .then((response) => response.json())
-    .then((data) => setApplications(data));
+  useEffect(() => {
+    function fetchApplications() {
+      fetch("/api/v1/applications")
+        .then((response) => response.json())
+        .then((data) => setApplications(data));
+    }
+
+    fetchApplications();
+  }, [])
+
 
   return (
     <div className="flex flex-col p-4 gap-4">
